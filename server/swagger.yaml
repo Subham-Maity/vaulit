@@ -1,0 +1,172 @@
+openapi: 3.0.0
+paths:
+  /xam:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /xam/auth/admin/setup:
+    post:
+      description: >-
+        Creates the single admin user in Firebase Auth and the database.
+        Requires the `x-setup-key` header. Throws 409 if an admin already
+        exists.
+      operationId: AuthController_setup
+      parameters:
+        - name: x-setup-key
+          required: true
+          in: header
+          description: Secret key from ADMIN_SETUP_SECRET_KEY env var
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSetupDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSetupResponseDto'
+        '403':
+          description: Invalid or missing setup key
+        '409':
+          description: Admin already exists
+      summary: One-time admin account creation
+      tags: &ref_0
+        - Auth
+  /xam/auth/admin/login:
+    post:
+      description: >-
+        The client signs in with email/password via the Firebase JS SDK,
+        retrieves the ID token via `getIdToken()`, and sends it here. On success
+        a `admin_session` httpOnly cookie is set.
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminLoginResponseDto'
+        '401':
+          description: Authentication failed
+      summary: Admin login – exchange Firebase ID token for session cookie
+      tags: *ref_0
+  /xam/auth/admin/logout:
+    post:
+      description: >-
+        Revokes all Firebase refresh tokens for the admin (invalidates all
+        sessions across devices), then clears the browser cookie.
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        '200':
+          description: Logged out successfully
+        '401':
+          description: No active session
+      security:
+        - admin_session: []
+      summary: Admin logout – revoke tokens and clear session cookie
+      tags: *ref_0
+info:
+  title: XAM-PROD BACKEND
+  description: XAM-PROD Application Backend API
+  version: 1.0.0
+  contact:
+    name: SUBHAM MAITY
+    url: https://github.com/Subham-Maity
+    email: maitysubham4041@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+tags:
+  - name: subham-xam
+    description: Developer of this app
+servers:
+  - url: http://localhost:3336
+    description: Local server (development)
+  - url: http://210.89.44.183:3336/xam
+    description: Staging server (testing)
+  - url: http://210.89.44.183:3336/xam
+    description: Production server (live)
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    AdminSetupDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: admin@portfolio.dev
+        password:
+          type: string
+          minLength: 12
+          description: Strong admin password (min 12 chars)
+      required:
+        - email
+        - password
+    AdminSetupResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Setup successful message
+          example: Admin account setup correctly
+        admin:
+          type: object
+          description: Admin details
+          example:
+            id: cuid...
+            email: admin@portfolio.dev
+      required:
+        - message
+        - admin
+    AdminLoginDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Admin email address
+          example: admin@portfolio.dev
+        idToken:
+          type: string
+          description: Firebase ID token from client-side signInWithEmailAndPassword
+      required:
+        - email
+        - idToken
+    AdminLoginResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: Admin login successful
+        admin:
+          type: object
+          description: Admin details
+          example:
+            id: cuid...
+            email: admin@portfolio.dev
+      required:
+        - message
+        - admin
