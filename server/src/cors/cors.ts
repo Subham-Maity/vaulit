@@ -36,7 +36,7 @@ export const configureCors = (app: INestApplication): void => {
         callback(new Error(`CORS blocked for: ${origin}`));
       }
     },
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-type', 'Cookie'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-type', 'Cookie', 'x-setup-key'],
     exposedHeaders: ['X-Total-Count'],
     credentials: true,
     optionsSuccessStatus: 200,

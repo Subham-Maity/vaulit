@@ -11,6 +11,7 @@
 - **POST** `/xam/auth/admin/setup` - [One-time admin account creation](#post--xam-auth-admin-setup)
 - **POST** `/xam/auth/admin/login` - [Admin login – exchange Firebase ID token for session cookie](#post--xam-auth-admin-login)
 - **POST** `/xam/auth/admin/logout` - [Admin logout – revoke tokens and clear session cookie](#post--xam-auth-admin-logout)
+- **GET** `/xam/auth/admin/me` - [Get current session admin](#get--xam-auth-admin-me)
 
 ---
 
@@ -111,6 +112,20 @@ Revokes all Firebase refresh tokens for the admin (invalidates all sessions acro
 **Responses:**
 
 **200** - Logged out successfully
+
+**401** - No active session
+
+---
+
+### Get current session admin
+
+**GET** `/xam/auth/admin/me`
+
+Returns the admin info for the current session. Used by the frontend to validate the session cookie.
+
+**Responses:**
+
+**200** - Current admin info
 
 **401** - No active session
 

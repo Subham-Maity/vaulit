@@ -19,13 +19,13 @@ import { FirebaseAdminModule } from './firebase';
 
 LoggerMiddleware.configure({
   logRequest: true,
-  logHeaders: false,
-  logBody: false,
-  logResponse: false,
-  logResponseBody: false,
+  logHeaders: true,
+  logBody: true,
+  logResponse: true,
+  logResponseBody: true,
   logLatency: true,
-  logUserAgent: false,
-  logIP: false,
+  logUserAgent: true,
+  logIP: true,
   logProtocol: true,
   maxResponseBodyLength: 20000,
 });

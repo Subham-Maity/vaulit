@@ -150,9 +150,10 @@ export class AdminAuthService {
     }
 
     // Step 3: Create Firebase session cookie
-    const maxAge = this.configService.get<number>(
-      'FIREBASE_SESSION_COOKIE_MAX_AGE',
-      432_000_000, // 5 days default
+    const maxAge = Number(
+      this.configService.get<string>(
+        'FIREBASE_SESSION_COOKIE_MAX_AGE',
+      ) ?? 432_000_000,  // 5 days default
     );
 
     let sessionCookie: string;

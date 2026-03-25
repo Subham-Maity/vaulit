@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   HttpStatus,
@@ -135,5 +136,24 @@ export class AuthController {
     });
 
     return result;
+  }
+
+  // ─── Me ─────────────────────────────────────────────────────────────────────
+
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(FirebaseAuthGuard)
+  @ApiCookieAuth(SESSION_COOKIE_NAME)
+  @ApiOperation({
+    summary: 'Get current session admin',
+    description:
+      'Returns the admin info for the current session. Used by the frontend to validate the session cookie.',
+  })
+  @ApiResponse({ status: 200, description: 'Current admin info' })
+  @ApiResponse({ status: 401, description: 'No active session' })
+  async me(
+    @GetAdmin() admin: { uid: string; email: string; id: string },
+  ): Promise<{ id: string; email: string }> {
+    return { id: admin.id, email: admin.email };
   }
 }

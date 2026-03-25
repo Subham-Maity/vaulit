@@ -123,6 +123,30 @@
           "Auth"
         ]
       }
+    },
+    "/xam/auth/admin/me": {
+      "get": {
+        "description": "Returns the admin info for the current session. Used by the frontend to validate the session cookie.",
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current admin info"
+          },
+          "401": {
+            "description": "No active session"
+          }
+        },
+        "security": [
+          {
+            "admin_session": []
+          }
+        ],
+        "summary": "Get current session admin",
+        "tags": [
+          "Auth"
+        ]
+      }
     }
   },
   "info": {
