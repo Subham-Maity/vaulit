@@ -147,6 +147,164 @@
           "Auth"
         ]
       }
+    },
+    "/xam/news/search": {
+      "get": {
+        "description": "Fetches articles from the GDELT DOC 2.0 API (100+ languages, 200+ countries).\nSupports filtering by keyword, country (FIPS code), domain, language, GKG theme,\nand a date range. Results are paginated in-memory from up to 250 GDELT records.\n\n**Note:** GDELT's rolling search window covers the last ~3 months.",
+        "operationId": "NewsController_searchNews",
+        "parameters": [
+          {
+            "name": "keyword",
+            "required": true,
+            "in": "query",
+            "description": "Keywords to search for in article titles and content.",
+            "schema": {
+              "example": "stock market india sensex",
+              "type": "string"
+            }
+          },
+          {
+            "name": "countries",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated FIPS country codes",
+            "schema": {
+              "example": "IN,US",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "domains",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated source domains",
+            "schema": {
+              "example": "reuters.com,livemint.com",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "languages",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated language names",
+            "schema": {
+              "example": "English,Hindi",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "theme",
+            "required": false,
+            "in": "query",
+            "description": "GKG theme filter",
+            "schema": {
+              "example": "ECON_STOCKMARKET",
+              "type": "string",
+              "enum": [
+                "ECON_STOCKMARKET",
+                "ECON_TRADE",
+                "ECON_CURRENCY",
+                "ECON_INFLATION",
+                "ECON_BANKRUPTCY",
+                "ECONOMY_HISTORIC"
+              ]
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "ISO 8601 start date (GDELT 3-month window applies)",
+            "schema": {
+              "example": "2026-03-25",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "ISO 8601 end date",
+            "schema": {
+              "example": "2026-03-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "enum": [
+                "DateDesc",
+                "DateAsc",
+                "ToneDesc",
+                "ToneAsc",
+                "HybridRel"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Articles per page (max 50)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+              "example": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of matched news articles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserNewsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters."
+          },
+          "500": {
+            "description": "GDELT service unreachable."
+          }
+        },
+        "summary": "Search global news via GDELT",
+        "tags": [
+          "News"
+        ]
+      }
     }
   },
   "info": {
@@ -270,6 +428,120 @@
         "required": [
           "message",
           "admin"
+        ]
+      },
+      "NewsArticleResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Full article URL.",
+            "example": "https://reuters.com/..."
+          },
+          "urlMobile": {
+            "type": "string",
+            "description": "Mobile article URL (may be empty).",
+            "example": ""
+          },
+          "title": {
+            "type": "string",
+            "description": "Article headline.",
+            "example": "Sensex jumps 700 points"
+          },
+          "seenDate": {
+            "type": "string",
+            "description": "ISO timestamp when GDELT indexed this article.",
+            "example": "2026-03-27T07:00:00Z"
+          },
+          "socialImage": {
+            "type": "string",
+            "description": "Social / og:image URL.",
+            "example": "https://..."
+          },
+          "domain": {
+            "type": "string",
+            "description": "Source domain.",
+            "example": "reuters.com"
+          },
+          "language": {
+            "type": "string",
+            "description": "Article language.",
+            "example": "English"
+          },
+          "sourceCountry": {
+            "type": "string",
+            "description": "FIPS 2-letter country code of source.",
+            "example": "IN"
+          }
+        },
+        "required": [
+          "url",
+          "title",
+          "seenDate",
+          "domain",
+          "language",
+          "sourceCountry"
+        ]
+      },
+      "PaginationMetaResponseDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 25
+          },
+          "total": {
+            "type": "number",
+            "example": 120
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 5
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "example": true
+          },
+          "hasPrevPage": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "hasNextPage",
+          "hasPrevPage"
+        ]
+      },
+      "UserNewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewsArticleResponseDto"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetaResponseDto"
+          },
+          "gdeltQueryUrl": {
+            "type": "string",
+            "description": "The resolved GDELT query URL (useful for debugging).",
+            "example": "https://api.gdeltproject.org/api/v2/doc/doc?query=..."
+          }
+        },
+        "required": [
+          "articles",
+          "pagination",
+          "gdeltQueryUrl"
         ]
       }
     }

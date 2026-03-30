@@ -12,6 +12,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { validateConfig } from './validate/env.validation';
 import { AuthModule } from './auth';
 import { FirebaseAdminModule } from './firebase';
+import { NewsModule } from './news';
 
 // New modules for resume scoring
 
@@ -64,6 +65,9 @@ LoggerMiddleware.configure({
 
     // Authentication
     AuthModule,
+
+    // News
+    NewsModule,
   ],
   controllers: [AppController],
   providers: [
